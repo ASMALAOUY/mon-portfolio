@@ -41,6 +41,12 @@ Portfolio personnel présentant mes compétences, projets, expériences, formati
 ## demo 
 
 
+
+
+https://github.com/user-attachments/assets/7c4ab42f-0a3d-4084-bb2f-986181c20704
+
+
+
 ### Routage & SEO
 - **React Router DOM** - Navigation SPA
 - **React Helmet Async** - Gestion des métadonnées SEO
