@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# Mon Portfolio - Asma Laouy
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://mon-portfolio-asma.vercel.app)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-Currently, two official plugins are available:
+## 📋 À propos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Portfolio personnel présentant mes compétences, projets, expériences, formations et certifications. Développé avec React, TypeScript et Tailwind CSS.
 
-## React Compiler
+🔗 **Site en ligne :** [https://mon-portfolio-asma.vercel.app](https://mon-portfolio-asma.vercel.app)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Fonctionnalités
 
-## Expanding the ESLint configuration
+- 🔍 **Recherche et filtres** - Pour les certifications et projets
+- 🛡️ **Interface admin** - Gestion du contenu avec authentification
+- 📊 **SEO optimisé** - Métadonnées et balises pour les moteurs de recherche
+- ⚡ **Performances** - Build optimisé avec Vite
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🗂️ Pages
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Page | URL | Description |
+|------|-----|-------------|
+| Accueil | `/` | Présentation et compétences |
+| Projets | `/projects` | Mes réalisations |
+| Expérience | `/experience` | Parcours professionnel |
+| Formations | `/education` | Parcours académique |
+| Certifications | `/certifications` | Badges et certificats |
+| Contact | `/contact` | Informations de contact |
+| Admin | `/admin` | Gestion du contenu (protégé) |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠️ Technologies utilisées
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Frontend
+- **React 18** - Bibliothèque UI
+- **TypeScript** - Typage statique
+- **Tailwind CSS** - Framework CSS utilitaire
+- **shadcn/ui** - Composants UI réutilisables
+## demo 
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Routage & SEO
+- **React Router DOM** - Navigation SPA
+- **React Helmet Async** - Gestion des métadonnées SEO
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Outils de développement
+- **Vite** - Build tool rapide
+- **ESLint** - Analyse du code
+- **Prettier** - Formatage du code
+
+### Déploiement
+- **Vercel** - Hébergement et déploiement continu
+
+## 📦 Installation
+
+### Prérequis
+- Node.js (version 18 ou supérieure)
+- npm ou yarn
+
+### Étapes d'installation
+
+```bash
+# Cloner le repository
+git clone https://github.com/ASMALAOUY/mon-portfolio.git
+
+# Accéder au dossier
+cd mon-portfolio
+
+# Installer les dépendances
+npm install
+
+# Lancer le serveur de développement
+npm run dev
