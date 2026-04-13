@@ -1,0 +1,368 @@
+import { education } from "@/data/education";
+import { Helmet } from "react-helmet-async";
+
+// ── Degree level map (Bac + X) ─────────────────────────────────────────────
+const degreeLevel: Record<string, number> = {
+  "Bac+1": 1,
+  "DEUG":  2,
+  "Licence": 3,
+  "Licence Pro": 3,
+  "Master 1": 4,
+  "Master": 5,
+  "Doctorat": 8,
+};
+
+// ── School style map ───────────────────────────────────────────────────────
+const schoolStyles: Record<string, {
+  grad: string; light: string; accent: string; initials: string;
+}> = {
+  "ENS": {
+    grad: "linear-gradient(135deg,#7c3aed,#a855f7)",
+    light: "#f5f3ff", accent: "#7c3aed", initials: "ENS",
+  },
+  "FSTG": {
+    grad: "linear-gradient(135deg,#0369a1,#0ea5e9)",
+    light: "#f0f9ff", accent: "#0369a1", initials: "FST",
+  },
+};
+
+function getSchoolStyle(school: string) {
+  for (const [k, v] of Object.entries(schoolStyles)) {
+    if (school.includes(k)) return v;
+  }
+  return {
+    grad: "linear-gradient(135deg,#6b7280,#9ca3af)",
+    light: "#f9fafb", accent: "#6b7280",
+    initials: school.substring(0, 3).toUpperCase(),
+  };
+}
+
+export default function EducationPage() {
+  const maxLevel = Math.max(...education.map(e => degreeLevel[e.degree] ?? 1));
+
+  return (
+    <>
+      <Helmet>
+        <title>Formations | Asma Laouy</title>
+        <meta name="description" content="Mon parcours académique et formations" />
+      </Helmet>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+        .edp { font-family: 'DM Sans', sans-serif; }
+
+        /* ── Page header ── */
+        .edp-label {
+          font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em;
+          text-transform: uppercase; color: hsl(var(--muted-foreground));
+          display: block; margin-bottom: 0.4rem;
+        }
+        .edp-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(2rem, 5vw, 3rem); font-weight: 700;
+          line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.4rem;
+        }
+        .edp-sub {
+          font-size: 0.88rem; color: hsl(var(--muted-foreground));
+          font-weight: 300; margin-bottom: 2.5rem;
+        }
+
+        /* ── Hero stats banner ── */
+        .edp-hero {
+          background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 60%, #f0fdf4 100%);
+          border: 1px solid hsl(var(--border));
+          border-radius: 16px; padding: 1.75rem 2rem;
+          display: flex; align-items: center; gap: 2rem;
+          margin-bottom: 2.5rem; flex-wrap: wrap;
+        }
+        .edp-hero-stat { text-align: center; flex: 1; min-width: 80px; }
+        .edp-hero-num {
+          font-family: 'Playfair Display', serif;
+          font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 0.2rem;
+        }
+        .edp-hero-lbl { font-size: 0.72rem; color: hsl(var(--muted-foreground)); }
+        .edp-hero-div { width: 1px; height: 48px; background: hsl(var(--border)); flex-shrink: 0; }
+
+        /* ── Timeline ── */
+        .edp-timeline { display: flex; flex-direction: column; gap: 1.5rem; position: relative; }
+        .edp-timeline::before {
+          content: ''; position: absolute;
+          left: 27px; top: 28px; bottom: 0; width: 1px;
+          background: linear-gradient(to bottom, hsl(var(--border)), transparent);
+        }
+        @media (max-width: 640px) { .edp-timeline::before { display: none; } }
+
+        /* ── Entry ── */
+        .edp-entry {
+          display: grid; grid-template-columns: 56px 1fr;
+          gap: 0 1.25rem;
+          animation: edp-up 0.42s ease both;
+        }
+        .edp-entry:nth-child(2) { animation-delay: .12s }
+        .edp-entry:nth-child(3) { animation-delay: .24s }
+        @media (max-width: 640px) {
+          .edp-entry { grid-template-columns: 1fr; gap: 0.75rem; }
+        }
+
+        /* Avatar */
+        .edp-avatar-col { display: flex; flex-direction: column; align-items: center; }
+        .edp-avatar {
+          width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 0.72rem; font-weight: 700;
+          letter-spacing: 0.04em; text-align: center; line-height: 1.2;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.15); position: relative; z-index: 1;
+        }
+        @media (max-width: 640px) {
+          .edp-avatar-col { flex-direction: row; gap: 0.75rem; align-items: center; }
+        }
+
+        /* Card */
+        .edp-card {
+          background: hsl(var(--card)); border: 1px solid hsl(var(--border));
+          border-radius: 16px; overflow: hidden;
+          transition: transform 0.22s, box-shadow 0.22s; flex: 1;
+        }
+        .edp-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .edp-card-bar { height: 4px; }
+        .edp-card-body { padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+        /* Top row */
+        .edp-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .edp-degree {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.1rem; font-weight: 700; line-height: 1.25;
+        }
+        .edp-degree-badge {
+          flex-shrink: 0; padding: 0.25rem 0.75rem; border-radius: 999px;
+          font-size: 0.7rem; font-weight: 600; border: 1.5px solid; white-space: nowrap;
+        }
+
+        /* School row */
+        .edp-school-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .edp-school { font-size: 0.88rem; font-weight: 500; }
+        .edp-dot { color: hsl(var(--border)); }
+        .edp-location { font-size: 0.8rem; color: hsl(var(--muted-foreground)); }
+
+        /* Date + current badge */
+        .edp-date-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .edp-date-pill {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          padding: 0.28rem 0.75rem; border-radius: 999px;
+          background: hsl(var(--secondary)); font-size: 0.76rem;
+          color: hsl(var(--muted-foreground));
+        }
+        .edp-current-badge {
+          display: inline-flex; align-items: center; gap: 0.35rem;
+          padding: 0.28rem 0.75rem; border-radius: 999px;
+          background: #dcfce7; color: #166534;
+          font-size: 0.72rem; font-weight: 600; border: 1px solid #86efac;
+        }
+        .edp-current-dot {
+          width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+          animation: edp-pulse 1.8s infinite;
+        }
+
+        /* Progress bar */
+        .edp-progress-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+        .edp-progress-label-row {
+          display: flex; justify-content: space-between;
+          font-size: 0.68rem; color: hsl(var(--muted-foreground));
+        }
+        .edp-progress-track {
+          height: 5px; background: hsl(var(--border)); border-radius: 999px; overflow: hidden;
+        }
+        .edp-progress-fill { height: 100%; border-radius: 999px; }
+
+        /* Divider */
+        .edp-divider { height: 1px; background: hsl(var(--border)); }
+
+        /* Section label */
+        .edp-section-label {
+          font-size: 0.65rem; font-weight: 600; letter-spacing: 0.13em;
+          text-transform: uppercase; color: hsl(var(--muted-foreground));
+          margin-bottom: 0.55rem; display: block;
+        }
+
+        /* Courses */
+        .edp-courses { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .edp-course {
+          padding: 0.28rem 0.65rem; border: 1px solid hsl(var(--border));
+          border-radius: 6px; font-size: 0.72rem; color: hsl(var(--muted-foreground));
+          transition: border-color 0.18s, color 0.18s;
+        }
+        .edp-course:hover { border-color: hsl(var(--primary)); color: hsl(var(--foreground)); }
+
+        /* Highlights */
+        .edp-highlights { display: flex; flex-direction: column; gap: 0.5rem; }
+        .edp-highlight { display: flex; gap: 0.65rem; align-items: flex-start; }
+        .edp-hl-star { font-size: 0.7rem; margin-top: 0.25rem; flex-shrink: 0; }
+        .edp-hl-text {
+          font-size: 0.81rem; color: hsl(var(--muted-foreground));
+          line-height: 1.55; font-weight: 300;
+        }
+
+        @keyframes edp-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes edp-pulse {
+          0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+        }
+      `}</style>
+
+      <div className="edp py-12">
+
+        {/* Header */}
+        <span className="edp-label">Parcours académique</span>
+        <h1 className="edp-title">Formations</h1>
+        <p className="edp-sub">Mes diplômes et spécialisations</p>
+
+        {/* Stats */}
+        <div className="edp-hero">
+          <div className="edp-hero-stat">
+            <div className="edp-hero-num">{education.length}</div>
+            <div className="edp-hero-lbl">Formations</div>
+          </div>
+          <div className="edp-hero-div" />
+          <div className="edp-hero-stat">
+            <div className="edp-hero-num">
+              {education.filter(e => e.endDate === "Présent").length}
+            </div>
+            <div className="edp-hero-lbl">En cours</div>
+          </div>
+          <div className="edp-hero-div" />
+          <div className="edp-hero-stat">
+            <div className="edp-hero-num">
+              {new Set(education.flatMap(e => e.courses)).size}
+            </div>
+            <div className="edp-hero-lbl">Cours suivis</div>
+          </div>
+          <div className="edp-hero-div" />
+          <div className="edp-hero-stat">
+            <div className="edp-hero-num">+{maxLevel}</div>
+            <div className="edp-hero-lbl">Niveau Bac</div>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="edp-timeline">
+          {education.map((edu) => {
+            const s = getSchoolStyle(edu.school);
+            const isCurrent = edu.endDate === "Présent";
+            const level = degreeLevel[edu.degree] ?? 1;
+            const progressPct = Math.round((level / maxLevel) * 100);
+
+            // Badge color: purple for current, blue for completed
+            const badgeStyle = isCurrent
+              ? { bg: "#f5f3ff", text: "#5b21b6", border: "#c4b5fd" }
+              : { bg: "#f0f9ff", text: "#0c4a6e", border: "#bae6fd" };
+
+            return (
+              <div key={edu.id} className="edp-entry">
+
+                {/* Avatar */}
+                <div className="edp-avatar-col">
+                  <div className="edp-avatar" style={{ background: s.grad }}>
+                    {s.initials}
+                  </div>
+                </div>
+
+                {/* Card */}
+                <div className="edp-card">
+                  <div className="edp-card-bar" style={{ background: s.grad }} />
+
+                  <div className="edp-card-body">
+
+                    {/* Degree + Bac badge */}
+                    <div className="edp-card-top">
+                      <h2 className="edp-degree">{edu.degree} en {edu.field}</h2>
+                      <span
+                        className="edp-degree-badge"
+                        style={{
+                          background: badgeStyle.bg,
+                          color: badgeStyle.text,
+                          borderColor: badgeStyle.border,
+                        }}
+                      >
+                        Bac +{level}
+                      </span>
+                    </div>
+
+                    {/* School + location */}
+                    <div className="edp-school-row">
+                      <span className="edp-school" style={{ color: s.accent }}>
+                        {edu.school}
+                      </span>
+                      <span className="edp-dot">·</span>
+                      <span className="edp-location">📍 {edu.location}</span>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="edp-date-row">
+                      <div className="edp-date-pill">
+                        📅 {edu.startDate} — {edu.endDate}
+                      </div>
+                      {isCurrent && (
+                        <div className="edp-current-badge">
+                          <span className="edp-current-dot" />
+                          En cours
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="edp-progress-wrap">
+                      <div className="edp-progress-label-row">
+                        <span>Niveau académique</span>
+                        <span>Bac +{level}</span>
+                      </div>
+                      <div className="edp-progress-track">
+                        <div
+                          className="edp-progress-fill"
+                          style={{ width: `${progressPct}%`, background: s.grad }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="edp-divider" />
+
+                    {/* Courses */}
+                    {edu.courses.length > 0 && (
+                      <div>
+                        <span className="edp-section-label">Cours principaux</span>
+                        <div className="edp-courses">
+                          {edu.courses.map((course) => (
+                            <span key={course} className="edp-course">{course}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Highlights */}
+                    {edu.highlights && edu.highlights.length > 0 && (
+                      <div>
+                        <span className="edp-section-label">Points forts</span>
+                        <div className="edp-highlights">
+                          {edu.highlights.map((h, i) => (
+                            <div key={i} className="edp-highlight">
+                              <span className="edp-hl-star" style={{ color: s.accent }}>✦</span>
+                              <p className="edp-hl-text">{h}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </>
+  );
+}
