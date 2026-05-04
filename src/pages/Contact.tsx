@@ -3,7 +3,7 @@ import { useState } from "react";
 import { profile } from "@/data/profile";
 
 // ── Remplacer par votre ID Formspree (créer compte gratuit sur formspree.io) ──
-const FORMSPREE_URL = "https://formspree.io/f/YOUR_FORM_ID";
+const FORMSPREE_URL = "https://formspree.io/f/xykoedvz";
 
 type ContactItem = {
   icon: React.ReactNode;
