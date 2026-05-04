@@ -2,7 +2,6 @@ import { certifications } from "@/data/certifications";
 import { useState, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 
-// ── Color per tag ─────────────────────────────────────────────────────────────
 const catColor: Record<string, { bg: string; text: string; border: string }> = {
   Web:               { bg: "#eff6ff", text: "#1d4ed8", border: "#bfdbfe" },
   Frontend:          { bg: "#eff6ff", text: "#1d4ed8", border: "#bfdbfe" },
@@ -17,7 +16,7 @@ const catColor: Record<string, { bg: string; text: string; border: string }> = {
   Networking:        { bg: "#f0f9ff", text: "#0c4a6e", border: "#bae6fd" },
   Infrastructure:    { bg: "#f0f9ff", text: "#0c4a6e", border: "#bae6fd" },
   IA:                { bg: "#fdf4ff", text: "#701a75", border: "#f0abfc" },
-  "Machine Learning": { bg: "#fdf4ff", text: "#701a75", border: "#f0abfc" },
+  "Machine Learning":{ bg: "#fdf4ff", text: "#701a75", border: "#f0abfc" },
   "Data Science":    { bg: "#fdf4ff", text: "#701a75", border: "#f0abfc" },
 };
 
@@ -26,7 +25,6 @@ function getCatStyle(tags: string[]) {
   return { bg: "#f9fafb", text: "#374151", border: "#e5e7eb" };
 }
 
-// ── Issuer logo placeholder colors ───────────────────────────────────────────
 const issuerColorMap: Record<string, string> = {
   Cisco: "#1ba0d8", Programiz: "#2ecc71", "MLIA Edu": "#7c3aed",
   MLIAEdu: "#7c3aed", ENS: "#e11d48", Udemy: "#a435f0", SoloLearn: "#23b4e8",
@@ -61,14 +59,15 @@ export default function CertificationsPage() {
         !q ||
         c.title.toLowerCase().includes(q) ||
         c.issuer.toLowerCase().includes(q) ||
-        c.skills.some((s) => s.toLowerCase().includes(q));
+        c.skills.some((s) => s.toLowerCase().includes(q)) ||
+        c.tags.some((t) => t.toLowerCase().includes(q));
       const matchTag = !activeTag || c.tags.includes(activeTag);
       return matchSearch && matchTag;
     });
   }, [search, activeTag]);
 
-  const activeCount = certifications.filter((c) => c.status === "active").length;
-  const uniqueIssuers = [...new Set(certifications.map(c => c.issuer.split("/")[0].trim()))].length;
+  const activeCount   = certifications.filter((c) => c.status === "active").length;
+  const uniqueIssuers = new Set(certifications.map((c) => c.issuer)).size;
 
   return (
     <>
@@ -78,196 +77,177 @@ export default function CertificationsPage() {
       </Helmet>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+        .cp { font-family: 'DM Sans', sans-serif; padding-top: 2rem; }
 
-        .cp { font-family: 'DM Sans', sans-serif; }
-
-        /* Hero */
-        .cp-hero {
-          background: linear-gradient(135deg, #f0f4ff 0%, #fdf0ff 50%, #fff0f5 100%);
-          border-radius: 16px; padding: 2.5rem 2rem; text-align: center;
-          margin-bottom: 2.5rem; border: 1px solid #e9d5ff;
+        /* ── Page header — simple, sans dégradé ── */
+        .cp-label {
+          font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em;
+          text-transform: uppercase; color: hsl(var(--muted-foreground));
+          display: block; margin-bottom: 0.4rem;
         }
-        .cp-hero-title {
+        .cp-title {
           font-family: 'Playfair Display', serif;
-          font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 700;
-          letter-spacing: -0.02em; margin-bottom: 0.4rem;
+          font-size: clamp(2rem, 5vw, 3rem); font-weight: 700;
+          line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.4rem;
           color: hsl(var(--foreground));
         }
-        .cp-hero-sub { font-size: 0.9rem; color: hsl(var(--muted-foreground)); font-weight: 300; }
-        .cp-hero-stats {
-          display: flex; justify-content: center; gap: 1.5rem;
-          margin-top: 1.25rem; flex-wrap: wrap;
+        .cp-sub {
+          font-size: 0.88rem; color: hsl(var(--muted-foreground));
+          font-weight: 300; margin-bottom: 0.6rem;
         }
-        .cp-stat {
-          display: flex; align-items: center; gap: 0.5rem;
-          background: white; border: 1px solid hsl(var(--border));
-          border-radius: 999px; padding: 0.35rem 1rem;
-          font-size: 0.78rem; font-weight: 500;
+        .cp-header-stats {
+          display: flex; align-items: center; gap: 1rem;
+          font-size: 0.8rem; color: hsl(var(--muted-foreground));
+          margin-bottom: 2rem;
         }
-        .cp-stat-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+        .cp-active-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; margin-right: 0.4rem; }
+        .cp-header-sep { color: hsl(var(--border)); }
 
-        /* Controls */
-        .cp-controls { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+        /* ── Barre de recherche ── */
+        .cp-controls { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
         .cp-search-wrap { position: relative; }
         .cp-search {
-          width: 100%; padding: 0.72rem 1rem;
-          border: 1.5px solid hsl(var(--border)); border-radius: 12px;
+          width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem;
+          border: 1px solid hsl(var(--border)); border-radius: 8px;
           background: hsl(var(--background)); color: hsl(var(--foreground));
-          font-size: 0.85rem; font-family: 'DM Sans', sans-serif;
-          outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+          font-size: 0.85rem; outline: none; transition: border-color 0.2s;
+          font-family: 'DM Sans', sans-serif;
         }
-        .cp-search:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px #a78bfa20; }
-        .cp-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
-        .cp-filter-label { font-size: 0.7rem; color: hsl(var(--muted-foreground)); margin-right: 0.25rem; }
+        .cp-search:focus { border-color: hsl(var(--primary)); }
+        .cp-search-icon {
+          position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+          color: hsl(var(--muted-foreground)); pointer-events: none;
+        }
+
+        /* ── Filtres ── */
+        .cp-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .cp-filter-label { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
         .cp-ftag {
-          padding: 0.28rem 0.75rem; border-radius: 999px; font-size: 0.73rem; font-weight: 500;
-          cursor: pointer; border: 1.5px solid hsl(var(--border));
-          background: hsl(var(--background)); color: hsl(var(--muted-foreground));
-          font-family: 'DM Sans', sans-serif; transition: all 0.16s; line-height: 1.4;
+          padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500;
+          border: 1px solid hsl(var(--border)); background: transparent;
+          color: hsl(var(--muted-foreground)); cursor: pointer; transition: all 0.15s;
+          font-family: 'DM Sans', sans-serif;
         }
-        .cp-ftag:hover { border-color: #a78bfa; color: #7c3aed; background: #f5f3ff; }
-        .cp-ftag.on { background: #7c3aed; color: white; border-color: #7c3aed; }
+        .cp-ftag:hover { background: hsl(var(--secondary)); color: hsl(var(--foreground)); }
+        .cp-ftag.on { background: hsl(var(--foreground)); color: hsl(var(--background)); border-color: hsl(var(--foreground)); }
 
-        /* Grid */
-        .cp-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 1.25rem;
-        }
+        /* ── Grille ── */
+        .cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        @media (max-width: 640px) { .cp-grid { grid-template-columns: 1fr; } }
 
-        /* Card */
+        /* ── Carte ── */
         .cp-card {
-          background: hsl(var(--card));
-          border: 1px solid hsl(var(--border));
-          border-radius: 16px; overflow: hidden;
+          background: hsl(var(--card)); border: 1px solid hsl(var(--border));
+          border-radius: 14px; overflow: hidden;
+          transition: transform 0.2s, box-shadow 0.2s;
           display: flex; flex-direction: column;
-          transition: transform 0.22s, box-shadow 0.22s;
+          animation: cp-up 0.35s ease both;
         }
-        .cp-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(124,58,237,0.12); }
-        .cp-card-bar { height: 4px; }
+        .cp-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+        .cp-card-bar { height: 3px; }
+        .cp-card-body { padding: 1.1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
 
-        .cp-card-body { padding: 1.35rem; flex: 1; display: flex; flex-direction: column; gap: 0.8rem; }
-
-        /* Issuer avatar */
-        .cp-issuer-avatar {
-          width: 46px; height: 46px; border-radius: 10px;
+        /* Issuer + titre */
+        .cp-issuer-row { display: flex; align-items: center; gap: 0.75rem; }
+        .cp-issuer-badge {
+          width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.75rem; font-weight: 700; color: white;
-          letter-spacing: 0.02em; flex-shrink: 0;
+          color: white; font-size: 0.65rem; font-weight: 700;
         }
+        .cp-issuer-name { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+        .cp-issuer-date { font-size: 0.7rem; color: hsl(var(--muted-foreground)); }
 
-        /* Header row */
-        .cp-header { display: flex; gap: 0.75rem; align-items: flex-start; }
-        .cp-header-text { flex: 1; min-width: 0; }
-        .cp-title {
-          font-size: 0.88rem; font-weight: 600; line-height: 1.35;
+        .cp-cert-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 0.92rem; font-weight: 700; line-height: 1.35;
           color: hsl(var(--foreground));
-          display: -webkit-box; -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical; overflow: hidden;
         }
-        .cp-issuer-name { font-size: 0.76rem; color: hsl(var(--muted-foreground)); margin-top: 2px; }
-        .cp-date { font-size: 0.72rem; color: hsl(var(--muted-foreground)); margin-top: 1px; }
-
-        /* Verified */
-        .cp-verified {
-          display: inline-flex; align-items: center; gap: 0.4rem;
-          color: #16a34a; font-size: 0.76rem; font-weight: 500;
-        }
-        .cp-v-icon {
-          width: 17px; height: 17px; border-radius: 50%;
-          background: #dcfce7; border: 1.5px solid #86efac;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 0.55rem; flex-shrink: 0;
-        }
-
-        /* Credential ID */
-        .cp-cred-id {
-          display: flex; align-items: center; gap: 0.4rem;
-          font-size: 0.68rem; color: hsl(var(--muted-foreground));
-          background: hsl(var(--secondary)); padding: 0.3rem 0.6rem;
-          border-radius: 6px; overflow: hidden;
-        }
-        .cp-cred-id span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Tags */
-        .cp-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+        .cp-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
         .cp-tag {
-          padding: 0.18rem 0.55rem; border-radius: 999px;
-          font-size: 0.67rem; font-weight: 600; border: 1px solid;
+          padding: 0.2rem 0.55rem; border-radius: 4px;
+          font-size: 0.68rem; font-weight: 500; border: 1px solid;
         }
 
         /* Skills */
-        .cp-skills { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: auto; }
+        .cp-skills { display: flex; flex-wrap: wrap; gap: 0.3rem; }
         .cp-skill {
-          padding: 0.18rem 0.5rem; border-radius: 6px; font-size: 0.67rem;
-          background: hsl(var(--secondary)); color: hsl(var(--muted-foreground));
+          padding: 0.18rem 0.5rem; font-size: 0.68rem;
+          border: 1px solid hsl(var(--border)); border-radius: 4px;
+          color: hsl(var(--muted-foreground));
         }
 
-        /* Footer */
-        .cp-card-foot { padding: 0 1.35rem 1.2rem; }
-        .cp-verify-btn {
-          display: flex; align-items: center; justify-content: center; gap: 0.45rem;
-          width: 100%; padding: 0.58rem 1rem;
-          border: 1.5px solid hsl(var(--border)); border-radius: 10px;
-          background: hsl(var(--background)); color: hsl(var(--foreground));
-          font-size: 0.79rem; font-weight: 500; font-family: 'DM Sans', sans-serif;
-          cursor: pointer; text-decoration: none; transition: all 0.18s;
+        /* Footer carte */
+        .cp-card-footer {
+          margin-top: auto;
+          padding-top: 0.75rem;
+          border-top: 1px solid hsl(var(--border));
+          display: flex; align-items: center; justify-content: space-between;
         }
-        .cp-verify-btn:hover { border-color: #7c3aed; color: #7c3aed; background: #f5f3ff; }
-        .cp-verify-btn-off {
-          display: flex; align-items: center; justify-content: center; gap: 0.45rem;
-          width: 100%; padding: 0.58rem 1rem;
-          border: 1.5px dashed hsl(var(--border)); border-radius: 10px;
-          background: transparent; color: hsl(var(--muted-foreground));
-          font-size: 0.79rem; font-weight: 400; opacity: 0.5; cursor: default;
+        .cp-verify {
+          font-size: 0.75rem; font-weight: 500; color: hsl(var(--foreground));
+          text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
+          transition: opacity 0.15s;
         }
+        .cp-verify:hover { opacity: 0.7; }
+        .cp-status-active {
+          display: inline-flex; align-items: center; gap: 0.3rem;
+          font-size: 0.68rem; font-weight: 600; color: #16a34a;
+        }
+        .cp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
 
         /* Empty */
         .cp-empty { text-align: center; padding: 4rem 1rem; color: hsl(var(--muted-foreground)); }
+        .cp-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 
-        /* Animations */
-        @keyframes cp-up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-        .cp-card { animation: cp-up 0.38s ease both; }
-        .cp-card:nth-child(2) { animation-delay:.06s }
-        .cp-card:nth-child(3) { animation-delay:.12s }
-        .cp-card:nth-child(4) { animation-delay:.18s }
-        .cp-card:nth-child(5) { animation-delay:.24s }
-        .cp-card:nth-child(6) { animation-delay:.30s }
-        .cp-card:nth-child(7) { animation-delay:.36s }
-        .cp-card:nth-child(8) { animation-delay:.40s }
-        .cp-card:nth-child(n+9) { animation-delay:.44s }
+        @keyframes cp-up {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
       <div className="cp">
 
-        {/* Hero */}
-        <div className="cp-hero">
-          <h1 className="cp-hero-title">Certifications</h1>
-          <p className="cp-hero-sub">Validation de mes compétences techniques et académiques.</p>
-          <div className="cp-hero-stats">
-            <div className="cp-stat">
-              <span className="cp-stat-dot" />
+        {/* ── Header simple — SANS dégradé ── */}
+        <div style={{ marginBottom: "2rem" }}>
+          <span className="cp-label">Badges &amp; diplômes</span>
+          <h1 className="cp-title">Certifications</h1>
+          <p className="cp-sub">Validation de mes compétences techniques et académiques.</p>
+          <div className="cp-header-stats">
+            <span>
+              <span className="cp-active-dot" />
               {activeCount} certifications actives
-            </div>
-            <div className="cp-stat">
-              {uniqueIssuers} organismes
-            </div>
+            </span>
+            <span className="cp-header-sep">·</span>
+            <span>{uniqueIssuers} organismes</span>
           </div>
         </div>
 
-        {/* Controls */}
+        {/* ── Recherche + filtres ── */}
         <div className="cp-controls">
           <div className="cp-search-wrap">
+            <span className="cp-search-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+            </span>
             <input
-              type="text" className="cp-search"
+              type="text"
+              className="cp-search"
               placeholder="Rechercher par titre, émetteur, compétence..."
-              value={search} onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="cp-filters">
             <span className="cp-filter-label">Filtrer :</span>
-            <button className={`cp-ftag${activeTag === null ? " on" : ""}`} onClick={() => setActiveTag(null)}>
+            <button
+              className={`cp-ftag${activeTag === null ? " on" : ""}`}
+              onClick={() => setActiveTag(null)}
+            >
               Toutes ({certifications.length})
             </button>
             {allTags.map((tag) => (
@@ -282,115 +262,100 @@ export default function CertificationsPage() {
           </div>
         </div>
 
-        {/* Grid */}
-        {filtered.length > 0 ? (
+        {/* ── Grille de cartes ── */}
+        {filtered.length === 0 ? (
+          <div className="cp-empty">
+            <div className="cp-empty-icon">🔍</div>
+            <p>Aucune certification pour « {search} »</p>
+          </div>
+        ) : (
           <div className="cp-grid">
             {filtered.map((cert) => {
-              const catStyle = getCatStyle(cert.tags);
               const issuerColor = getIssuerColor(cert.issuer);
-              const initials = getIssuerInitials(cert.issuer);
-              
-              // Gradient bar color by first tag
-              const barColors: Record<string, string> = {
-                Web: "linear-gradient(90deg,#3b82f6,#60a5fa)",
-                Frontend: "linear-gradient(90deg,#3b82f6,#818cf8)",
-                Backend: "linear-gradient(90deg,#10b981,#34d399)",
-                PHP: "linear-gradient(90deg,#7c3aed,#a78bfa)",
-                Python: "linear-gradient(90deg,#f59e0b,#fbbf24)",
-                Java: "linear-gradient(90deg,#ef4444,#f97316)",
-                "C++": "linear-gradient(90deg,#8b5cf6,#a78bfa)",
-                Database: "linear-gradient(90deg,#14b8a6,#2dd4bf)",
-                SQL: "linear-gradient(90deg,#14b8a6,#2dd4bf)",
-                Networking: "linear-gradient(90deg,#0ea5e9,#38bdf8)",
-                IA: "linear-gradient(90deg,#d946ef,#e879f9)",
-                "Machine Learning": "linear-gradient(90deg,#d946ef,#e879f9)",
-                "Data Science": "linear-gradient(90deg,#d946ef,#8b5cf6)",
-              };
-              const barGradient = barColors[cert.tags[0]] ?? "linear-gradient(90deg,#7c3aed,#ec4899)";
+              const initials    = getIssuerInitials(cert.issuer);
+              const tagStyle    = getCatStyle(cert.tags);
+              const barGrad     = `linear-gradient(90deg, ${issuerColor}, ${issuerColor}99)`;
 
               return (
                 <div key={cert.id} className="cp-card">
-                  <div className="cp-card-bar" style={{ background: barGradient }} />
+                  <div className="cp-card-bar" style={{ background: barGrad }} />
 
                   <div className="cp-card-body">
-                    {/* Header: avatar + title */}
-                    <div className="cp-header">
-                      <div className="cp-issuer-avatar" style={{ background: issuerColor }}>
+                    {/* Émetteur */}
+                    <div className="cp-issuer-row">
+                      <div
+                        className="cp-issuer-badge"
+                        style={{ background: issuerColor }}
+                      >
                         {initials}
                       </div>
-                      <div className="cp-header-text">
-                        <p className="cp-title">{cert.title}</p>
-                        <p className="cp-issuer-name">{cert.issuer}</p>
-                        <p className="cp-date">Emise le {cert.issueDate}</p>
+                      <div>
+                        <div className="cp-issuer-name">{cert.issuer}</div>
+                        <div className="cp-issuer-date">Emise le {cert.issueDate}</div>
                       </div>
                     </div>
 
-                    {/* Status */}
-                    {cert.status === "active" ? (
-                      <div className="cp-verified">
-                        <div className="cp-v-icon">✓</div>
-                        Certificat vérifié
-                      </div>
-                    ) : (
-                      <div style={{ color: "#dc2626", fontSize: "0.76rem", fontWeight: 500 }}>
-                        Certification expirée
-                      </div>
-                    )}
-
-                    {/* Credential ID */}
-                    {cert.credentialId && (
-                      <div className="cp-cred-id">
-                        <span>ID : {cert.credentialId}</span>
-                      </div>
-                    )}
+                    {/* Titre */}
+                    <p className="cp-cert-title">{cert.title}</p>
 
                     {/* Tags */}
                     <div className="cp-tags">
-                      {cert.tags.map((tag) => (
-                        <span
-                          key={tag} className="cp-tag"
-                          style={{ background: catStyle.bg, color: catStyle.text, borderColor: catStyle.border }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                      {cert.tags.map((tag) => {
+                        const ts = catColor[tag] ?? tagStyle;
+                        return (
+                          <span
+                            key={tag}
+                            className="cp-tag"
+                            style={{
+                              background: ts.bg,
+                              color: ts.text,
+                              borderColor: ts.border,
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        );
+                      })}
                     </div>
 
-                    {/* Skills */}
-                    <div className="cp-skills">
-                      {cert.skills.map((s) => (
-                        <span key={s} className="cp-skill">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Verify button */}
-                  <div className="cp-card-foot">
-                    {cert.credentialUrl && cert.credentialUrl !== "#" ? (
-                      <a
-                        href={cert.credentialUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="cp-verify-btn"
-                      >
-                        Afficher le diplôme
-                      </a>
-                    ) : (
-                      <span className="cp-verify-btn-off">
-                        Lien non disponible
-                      </span>
+                    {/* Compétences */}
+                    {cert.skills.length > 0 && (
+                      <div className="cp-skills">
+                        {cert.skills.slice(0, 4).map((s) => (
+                          <span key={s} className="cp-skill">{s}</span>
+                        ))}
+                        {cert.skills.length > 4 && (
+                          <span className="cp-skill">+{cert.skills.length - 4}</span>
+                        )}
+                      </div>
                     )}
+
+                    {/* Footer */}
+                    <div className="cp-card-footer">
+                      {cert.credentialUrl ? (
+                        <a
+                          href={cert.credentialUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cp-verify"
+                        >
+                          Vérifier →
+                        </a>
+                      ) : (
+                        <span />
+                      )}
+                      {cert.status === "active" && (
+                        <span className="cp-status-active">
+                          <span className="cp-status-dot" /> Active
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        ) : (
-          <div className="cp-empty">
-            <p>Aucune certification trouvée pour "{search}"</p>
-          </div>
         )}
-
       </div>
     </>
   );

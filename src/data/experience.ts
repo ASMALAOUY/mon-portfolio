@@ -31,7 +31,7 @@ export const experiences: Experience[] = [
     supervisor: "Zouhair ELMANTI - Leader Technique, Développeur Principal",
     certificate: "Stage de 1 mois effectué avec sérieux et assiduité. Attestation délivrée le 24/12/2025"
   },
-  {
+   {
     id: "prefecture-safi",
     company: "Préfecture de Safi",
     position: "Stagiaire - Département Informatique",
@@ -39,26 +39,26 @@ export const experiences: Experience[] = [
     startDate: "2025-08",
     current: false,
     description: [
-      "Réalisation d’une application web de gestion des incidents.",
-      "Analyse des besoins et modélisation du système",
-      "Développement de l’application en utilisant l’architecture MVC.",
-      
+      "Conception et développement d'une application web complète de gestion des incidents pour la Province de Safi",
+      "Analyse des besoins métier, modélisation UML (diagrammes de cas d'utilisation et de classes)",
+      "Développement en architecture MVC : gestion des incidents, services, divisions et utilisateurs avec rôles différenciés",
+      "Mise en place d'une interface d'administration avec authentification et tableau de bord",
     ],
-    technologies: ["php", "html", "css","MySQL"]
+    technologies: ["PHP", "HTML", "CSS", "MySQL", "MVC", "Bootstrap"],
   },
   {
     id: "lycee-zineb",
     company: "Lycée Zineb Ennafzaoui",
-    position: "Stagiaire",
+    position: "Stagiaire — Enseignement Informatique",
     location: "Maroc",
     startDate: "2024-11",
     endDate: "2025-06",
     current: false,
     description: [
-      "Initiation des élèves à l'usage de l'outil informatique",
-      "Création de supports pédagogiques",
-      "Assistance technique"
+      "Animation de séances d'initiation à l'informatique pour des classes de lycée (30+ élèves par groupe)",
+      "Création de supports pédagogiques structurés (cours, exercices, QCM) sur les bases de l'informatique",
+      "Assistance technique aux élèves sur les outils bureautiques et la navigation internet",
     ],
-    technologies: ["Support informatique", "Pédagogie"]
-  }
+    technologies: ["Support informatique", "Pédagogie", "Suite Office"],
+  },
 ];
