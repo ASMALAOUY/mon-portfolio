@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { profile } from "@/data/profile";
 
-// ── Remplacer par votre ID Formspree (créer compte gratuit sur formspree.io) ──
+// URL Formspree
 const FORMSPREE_URL = "https://formspree.io/f/xykoedvz";
 
 type ContactItem = {
@@ -27,42 +27,62 @@ const LinkedinIcon = () => (
 );
 
 export default function Contact() {
-  const [form, setForm]       = useState({ name: "", email: "", message: "" });
-  const [sent, setSent]       = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
 
-  const handleSubmit = async () => {
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      return;
+    }
+
     setLoading(true);
     setError(false);
+
     try {
       const res = await fetch(FORMSPREE_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify(form),
       });
+
       if (res.ok) {
         setSent(true);
-        setForm({ name: "", email: "", message: "" });
+        setForm({
+          name: "",
+          email: "",
+          message: "",
+        });
       } else {
         setError(true);
       }
     } catch {
       setError(true);
     }
+
     setLoading(false);
   };
 
   const items: ContactItem[] = [
     {
-      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>,
+      icon: <span>✉</span>,
       label: "EMAIL",
       value: profile.email,
       href: `mailto:${profile.email}`,
     },
     {
-      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>,
+      icon: <span>📍</span>,
       label: "LOCALISATION",
       value: profile.location,
       href: "#",
@@ -70,7 +90,7 @@ export default function Contact() {
     {
       icon: <GithubIcon />,
       label: "GITHUB",
-      value: profile.github.replace("https://", "").toLowerCase(),
+      value: profile.github.replace("https://", ""),
       href: profile.github,
     },
     {
@@ -83,211 +103,215 @@ export default function Contact() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    padding: "0.65rem 0.85rem",
+    padding: "0.8rem",
     border: "1px solid hsl(var(--border))",
-    borderRadius: "4px",
-    background: "hsl(var(--background))",
-    color: "hsl(var(--foreground))",
-    fontSize: "0.85rem",
+    borderRadius: "6px",
+    background: "transparent",
+    color: "white",
+    fontSize: "0.9rem",
     outline: "none",
-    fontFamily: "'DM Sans', sans-serif",
-    transition: "border-color 0.2s",
   };
 
   return (
     <>
       <Helmet>
         <title>Contact | Asma Laouy</title>
-        <meta name="description" content="Contactez Asma Laouy pour toute opportunité" />
       </Helmet>
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
-        .pf-root { font-family: 'DM Sans', sans-serif; }
-        .pf-label { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
-        .contact-row {
-          display: grid;
-          grid-template-columns: 2.5rem 5.5rem 1fr;
-          align-items: center;
-          gap: 0;
-          padding: 1rem 0;
-          border-bottom: 1px solid hsl(var(--border));
-          text-decoration: none;
-          color: inherit;
-          transition: background 0.15s;
-          border-radius: 2px;
-        }
-        .contact-row:first-child { border-top: 1px solid hsl(var(--border)); }
-        .contact-row:hover { background: hsl(var(--secondary)); }
-        .contact-icon {
-          width: 2rem; height: 2rem;
-          display: flex; align-items: center; justify-content: center;
-          border: 1px solid hsl(var(--border)); border-radius: 2px;
-          font-size: 0.8rem; color: hsl(var(--muted-foreground)); flex-shrink: 0;
-        }
-        .contact-label-col {
-          font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em;
-          text-transform: uppercase; color: hsl(var(--muted-foreground));
-          padding-left: 0.5rem; padding-right: 0.5rem;
-        }
-        .contact-value {
-          font-size: 0.85rem; color: hsl(var(--foreground));
-          padding-left: 0.75rem; word-break: break-word;
-        }
-        .avail-badge {
-          display: inline-flex; align-items: center; gap: 0.5rem;
-          padding: 0.45rem 0.9rem; border: 1px solid #86efac;
-          border-radius: 999px; font-size: 0.75rem;
-          background: #dcfce7; color: #166534; margin-top: 0.75rem;
-        }
-        .dark .avail-badge {
-          background: #14532d; border-color: #16a34a; color: #86efac;
-        }
-        .avail-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
-        .cf-input:focus { border-color: hsl(var(--foreground)) !important; }
-        .cf-btn {
-          width: 100%; padding: 0.7rem 1rem;
-          background: hsl(var(--foreground)); color: hsl(var(--background));
-          border: none; border-radius: 4px; font-size: 0.85rem; font-weight: 500;
-          cursor: pointer; transition: opacity 0.2s;
-          font-family: 'DM Sans', sans-serif;
-        }
-        .cf-btn:hover:not(:disabled) { opacity: 0.8; }
-        .cf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .cf-success {
-          text-align: center; padding: 2rem;
-          color: #166534; background: #dcfce7;
-          border: 1px solid #86efac; border-radius: 8px;
-        }
-        .dark .cf-success { background: #14532d; border-color: #16a34a; color: #86efac; }
-        .cf-error {
-          font-size: 0.8rem; color: #dc2626;
-          padding: 0.5rem 0.75rem; background: #fee2e2;
-          border-radius: 4px; border: 1px solid #fca5a5;
-        }
-      `}</style>
-
-      <div className="pf-root py-12">
-        <div style={{ maxWidth: "42rem" }}>
+      <div className="py-12">
+        <div style={{ maxWidth: "700px" }}>
+          
+          {/* HEADER */}
           <div style={{ marginBottom: "2rem" }}>
-            <span className="pf-label" style={{ display: "block", marginBottom: "0.4rem" }}>
-              Restons en contact
-            </span>
-            <h1 style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(2rem, 5vw, 3rem)",
-              fontWeight: 700, lineHeight: 1.1,
-              letterSpacing: "-0.02em", marginBottom: "0.4rem",
-              color: "hsl(var(--foreground))",
-            }}>
+            <h1
+              style={{
+                fontSize: "3rem",
+                fontWeight: "bold",
+                marginBottom: "10px",
+              }}
+            >
               Contact
             </h1>
-            <p className="text-sm text-muted-foreground" style={{ fontWeight: 300 }}>
-              Disponible pour des opportunités de stage ou d'alternance.
+
+            <p style={{ color: "#aaa" }}>
+              Disponible pour stage, alternance ou opportunités freelance.
             </p>
-            <div className="avail-badge">
-              <span className="avail-dot" />
-              Disponible — ouverte aux opportunités
-            </div>
           </div>
 
-          {/* ── Infos contact ── */}
-          <div style={{ marginBottom: "2.5rem" }}>
+          {/* CONTACT INFO */}
+          <div style={{ marginBottom: "2rem" }}>
             {items.map((item) => {
               const isLink = item.href !== "#";
               const Tag = isLink ? "a" : "div";
-              const props = isLink
-                ? { href: item.href, target: item.href.startsWith("http") ? "_blank" : undefined, rel: "noopener noreferrer" }
-                : {};
+
               return (
-                <Tag key={item.label} className="contact-row" {...(props as Record<string, string>)}>
-                  <span className="contact-icon">{item.icon}</span>
-                  <span className="contact-label-col">{item.label}</span>
-                  <span className="contact-value">{item.value}</span>
+                <Tag
+                  key={item.label}
+                  href={isLink ? item.href : undefined}
+                  target="_blank"
+                  style={{
+                    display: "flex",
+                    gap: "15px",
+                    padding: "15px 0",
+                    borderBottom: "1px solid #222",
+                    textDecoration: "none",
+                    color: "white",
+                  }}
+                >
+                  <span>{item.icon}</span>
+                  <strong>{item.label}</strong>
+                  <span>{item.value}</span>
                 </Tag>
               );
             })}
           </div>
 
-          {/* ── Formulaire ── */}
+          {/* FORM */}
           <div>
-            <p className="pf-label" style={{ marginBottom: "1rem" }}>
+            <p
+              style={{
+                marginBottom: "1rem",
+                textTransform: "uppercase",
+                letterSpacing: "2px",
+              }}
+            >
               Envoyer un message
             </p>
 
             {sent ? (
-              <div className="cf-success">
-                <p style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>✓</p>
-                <p style={{ fontWeight: 600, marginBottom: "0.25rem" }}>Message envoyé !</p>
-                <p style={{ fontSize: "0.85rem" }}>Je vous réponds dans les plus brefs délais.</p>
+              <div
+                style={{
+                  background: "#1f3d2b",
+                  padding: "20px",
+                  borderRadius: "8px",
+                }}
+              >
+                <h3>✅ Message envoyé avec succès</h3>
+                <p>Je vous répondrai dès que possible.</p>
+
                 <button
                   onClick={() => setSent(false)}
-                  style={{ marginTop: "1rem", fontSize: "0.8rem", background: "none",
-                           border: "none", cursor: "pointer", textDecoration: "underline",
-                           color: "inherit" }}
+                  style={{
+                    marginTop: "15px",
+                    background: "none",
+                    border: "none",
+                    color: "white",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
                 >
                   Envoyer un autre message
                 </button>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+              <form
+                onSubmit={handleSubmit}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                }}
+              >
                 <input
-                  className="cf-input"
-                  style={inputStyle}
+                  type="text"
                   placeholder="Votre nom"
                   value={form.name}
-                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                />
-                <input
-                  className="cf-input"
                   style={inputStyle}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
+                />
+
+                <input
                   type="email"
                   placeholder="votre@email.com"
                   value={form.email}
-                  onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                  style={inputStyle}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
                 />
+
                 <textarea
-                  className="cf-input"
-                  style={{ ...inputStyle, resize: "none" }}
+                  rows={6}
                   placeholder="Votre message..."
-                  rows={5}
                   value={form.message}
-                  onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
+                  style={inputStyle}
+                  onChange={(e) =>
+                    setForm({ ...form, message: e.target.value })
+                  }
                 />
+
                 {error && (
-                  <div className="cf-error">
-                    Une erreur est survenue. Contactez-moi directement par email.
+                  <div
+                    style={{
+                      background: "#5a1d1d",
+                      padding: "10px",
+                      borderRadius: "6px",
+                    }}
+                  >
+                    Une erreur est survenue. Essayez plus tard.
                   </div>
                 )}
+
                 <button
-                  className="cf-btn"
-                  onClick={handleSubmit}
-                  disabled={loading || !form.name || !form.email || !form.message}
+                  type="submit"
+                  disabled={
+                    loading ||
+                    !form.name ||
+                    !form.email ||
+                    !form.message
+                  }
+                  style={{
+                    padding: "14px",
+                    background: "#d1d5db",
+                    color: "#000",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
                 >
-                  {loading ? "Envoi en cours…" : "Envoyer le message →"}
+                  {loading
+                    ? "Envoi en cours..."
+                    : "Envoyer le message →"}
                 </button>
-                <p style={{ fontSize: "0.72rem", color: "hsl(var(--muted-foreground))", textAlign: "center" }}>
-                  Remplacer <code>YOUR_FORM_ID</code> dans Contact.tsx par votre ID Formspree
+
+                <p
+                  style={{
+                    fontSize: "12px",
+                    textAlign: "center",
+                    color: "#999",
+                  }}
+                >
+                  Vos informations restent confidentielles.
                 </p>
-              </div>
+              </form>
             )}
           </div>
 
-          {/* ── Langues ── */}
-          <div style={{ marginTop: "2.5rem" }}>
-            <p className="pf-label" style={{ marginBottom: "0.75rem" }}>Langues</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              {profile.languages.map(({ name, level }) => (
-                <span key={name} style={{
-                  display: "inline-block",
-                  padding: "0.3rem 0.75rem",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "2px",
-                  fontSize: "0.78rem",
-                }}>
-                  <span style={{ fontWeight: 500 }}>{name}</span>
-                  <span className="text-muted-foreground"> · {level}</span>
-                </span>
+          {/* LANGUES */}
+          <div style={{ marginTop: "3rem" }}>
+            <h3 style={{ marginBottom: "1rem" }}>Langues</h3>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+              {profile.languages.map((lang) => (
+                <div
+                  key={lang.name}
+                  style={{
+                    border: "1px solid #333",
+                    padding: "8px 14px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  {lang.name} • {lang.level}
+                </div>
               ))}
             </div>
           </div>
